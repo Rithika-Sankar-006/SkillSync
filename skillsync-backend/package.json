@@ -1,0 +1,49 @@
+{
+  "name": "skillsync-backend",
+  "version": "1.0.0",
+  "description": "SkillSync Backend – Web-Based Student Collaboration & Skill Matching Platform",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:studio": "prisma studio",
+    "db:push": "prisma db push",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "skillsync",
+    "collaboration",
+    "matching",
+    "students",
+    "projects",
+    "node",
+    "express",
+    "prisma"
+  ],
+  "author": "Your Team",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.15.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.14",
+    "pdf-parse": "^1.1.1",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "prisma": "^5.15.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

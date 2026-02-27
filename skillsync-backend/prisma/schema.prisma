@@ -1,0 +1,147 @@
+generator client {
+  provider = prisma-client-js
+}
+
+datasource db {
+  provider = postgresql
+  url      = env(DATABASE_URL)
+}
+
+model User {
+  id                  String          @id @default(uuid())
+  name                String
+  email               String          @unique
+  passwordHash        String
+  role                String          @default(student)  student or admin
+  reputationScore     Int             @default(100)
+  activeProjectCount  Int             @default(0)
+  isAvailable         Boolean         @default(true)
+  department          String
+  year                Int
+  resumeUrl           String
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  skills              UserSkill[]
+  domains             UserDomain[]
+  projectMembers      ProjectMember[]
+  reputationLogs      ReputationLog[]
+  notifications       Notification[]
+  sentMessages        Message[]       @relation(SentMessages)
+  receivedMessages    Message[]       @relation(ReceivedMessages)
+
+  @@map(users)
+}
+
+model Skill {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  category    String       technical  non-technical
+  userSkills  UserSkill[]
+
+  @@map(skills)
+}
+
+model UserSkill {
+  id               String @id @default(uuid())
+  userId           String
+  skillId          String
+  proficiencyLevel Int    @default(3)  1-5
+
+  user  User  @relation(fields [userId], references [id], onDelete Cascade)
+  skill Skill @relation(fields [skillId], references [id], onDelete Cascade)
+
+  @@unique([userId, skillId])
+  @@map(user_skills)
+}
+
+model Domain {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  userDomains UserDomain[]
+
+  @@map(domains)
+}
+
+model UserDomain {
+  id       String @id @default(uuid())
+  userId   String
+  domainId String
+
+  user   User   @relation(fields [userId], references [id], onDelete Cascade)
+  domain Domain @relation(fields [domainId], references [id], onDelete Cascade)
+
+  @@unique([userId, domainId])
+  @@map(user_domains)
+}
+
+model Project {
+  id          String          @id @default(uuid())
+  title       String
+  description String
+  domain      String
+  createdBy   String
+  status      String          @default(active)  active, completed, flagged
+  deadline    DateTime
+  createdAt   DateTime        @default(now())
+
+  createdByUser User          @relation(fields [createdBy], references [id])
+  members       ProjectMember[]
+
+  @@map(projects)
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      String   leader  member
+  joinedAt  DateTime @default(now())
+
+  project Project @relation(fields [projectId], references [id], onDelete Cascade)
+  user    User    @relation(fields [userId], references [id], onDelete Cascade)
+
+  @@unique([projectId, userId])
+  @@map(project_members)
+}
+
+model ReputationLog {
+  id        String   @id @default(uuid())
+  userId    String
+  projectId String
+  change    Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields [userId], references [id], onDelete Cascade)
+
+  @@map(reputation_logs)
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  content    String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sender   User @relation(SentMessages, fields [senderId], references [id])
+  receiver User @relation(ReceivedMessages, fields [receiverId], references [id])
+
+  @@map(messages)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String    project_invite, match_found, reputation_update, message, etc.
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields [userId], references [id], onDelete Cascade)
+
+  @@map(notifications)
+}
